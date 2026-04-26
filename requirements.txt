@@ -1,6 +1,6 @@
-Flask==3.0.0
-waitress==3.0.0
-psycopg2-binary==2.9.9
-flask-cors==4.0.0
-PyJWT==2.8.0
-Werkzeug==3.0.1
+Flask
+waitress
+psycopg2-binary
+flask-cors
+PyJWT
+Werkzeug
