@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#dc2626">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RapidCrisis">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="images/icon-192.png">
+    <title>Crisis Messaging Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=3">
+</head>
+<body class="p-6">
+    <nav class="flex justify-between items-center mb-8 glass p-4 rounded-2xl">
+        <div class="flex items-center gap-3">
+            <div class="bg-red-600 p-2 rounded-lg"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg></div>
+            <span class="font-black text-xl uppercase tracking-tighter">Command Messages</span>
+        </div>
+        <div class="flex items-center gap-6">
+            <button onclick="toggleTheme()" class="p-2 rounded-xl glass hover:text-amber-400 transition-all">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M16.243 17.657l-.707-.707M7.757 6.343l-.707-.707" /></svg>
+            </button>
+            <a href="dashboard.html" id="dashLink" class="font-bold text-slate-400 hover:text-white transition-colors">Dashboard</a>
+            <button onclick="logout()" class="bg-slate-800 p-2 rounded-xl text-slate-400 hover:text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg></button>
+        </div>
+    </nav>
+
+    <div class="max-w-4xl mx-auto glass rounded-3xl overflow-hidden flex flex-col h-[700px] shadow-2xl">
+        <div class="p-6 border-b border-white/10 bg-white/5">
+            <h2 class="text-xl font-black uppercase tracking-widest">Internal Secure Channel</h2>
+            <p class="text-xs text-slate-500">Only authorized personnel can see these messages</p>
+        </div>
+        
+        <!-- Messages Area -->
+        <div id="messageDisplay" class="flex-1 overflow-y-auto p-6 space-y-4 flex flex-col-reverse">
+            <!-- Messages load here -->
+        </div>
+
+        <!-- Input Area -->
+        <div class="p-6 bg-slate-900/50 border-t border-white/10 flex gap-4">
+            <input type="text" id="msgInput" placeholder="Type a secure message..." class="flex-1 bg-slate-800 border-none rounded-xl p-4 text-white focus:ring-2 focus:ring-red-500 outline-none">
+            <button onclick="sendMessage()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-8 rounded-xl transition-all uppercase tracking-widest">Send</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (user.role === 'Admin') document.getElementById('dashLink').href = 'admin.html';
+        
+        async function loadMessages() {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+            const res = await fetch(`${API_BASE}/get-messages`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const msgs = await res.json();
+            const display = document.getElementById('messageDisplay');
+            display.innerHTML = msgs.map(m => `
+                <div class="flex flex-col ${m.sender_id === user.id ? 'items-end' : 'items-start'}">
+                    <div class="max-w-[70%] p-4 rounded-2xl ${m.sender_id === user.id ? 'bg-red-600 text-white rounded-tr-none' : 'glass text-white rounded-tl-none'}">
+                        <p class="text-[10px] font-black uppercase mb-1 opacity-70">${m.sender_name} (${m.sender_role})</p>
+                        <p class="text-sm">${m.content}</p>
+                    </div>
+                    <span class="text-[10px] text-slate-500 mt-1">${new Date(m.created_at).toLocaleTimeString()}</span>
+                </div>
+            `).join('');
+        }
+
+        async function sendMessage() {
+            const content = document.getElementById('msgInput').value;
+            if (!content) return;
+            await fetch(`${API_BASE}/send-message`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({ content })
+            });
+            document.getElementById('msgInput').value = '';
+            loadMessages();
+        }
+
+        setInterval(loadMessages, 3000);
+        loadMessages();
+    </script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
+</body>
+</html>

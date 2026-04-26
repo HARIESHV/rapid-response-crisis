@@ -1,0 +1,42 @@
+{
+  "name": "Rapid Crisis Response",
+  "short_name": "RapidCrisis",
+  "description": "Real-time emergency alert and response system for staff and admin",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#dc2626",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["utilities", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Staff Dashboard",
+      "short_name": "Dashboard",
+      "description": "Open the staff emergency dashboard",
+      "url": "/dashboard.html",
+      "icons": [{ "src": "images/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Admin Command Center",
+      "short_name": "Admin",
+      "description": "Open the admin command center",
+      "url": "/admin.html",
+      "icons": [{ "src": "images/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

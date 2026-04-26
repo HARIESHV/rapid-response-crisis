@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#dc2626">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RapidCrisis">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="images/icon-192.png">
+    <title>Rapid Crisis Response | Authentication</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=3">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6">
+    <div class="bg-hotel"></div>
+    
+    <div class="glass p-10 rounded-[2.5rem] w-full max-w-md animate-slide-in relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-500 via-orange-500 to-red-500"></div>
+        
+        <div class="text-center mb-10">
+            <div class="bg-red-500/20 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-red-500/30">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-red-500 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <h1 class="text-4xl font-extrabold text-white tracking-tight uppercase">Rapid Crisis</h1>
+            <p class="text-slate-400 mt-2 font-light">Secure Staff Access Portal</p>
+        </div>
+
+        <!-- Login Form -->
+        <div id="loginForm" class="space-y-5">
+            <div class="group">
+                <input type="email" id="email" placeholder="Email Address" class="w-full bg-slate-800/50 border border-slate-700 rounded-2xl p-4 text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition-all placeholder:text-slate-500">
+            </div>
+            <div class="group">
+                <input type="password" id="password" placeholder="Password" class="w-full bg-slate-800/50 border border-slate-700 rounded-2xl p-4 text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition-all placeholder:text-slate-500">
+            </div>
+            <button onclick="handleLogin()" id="loginBtn" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-4 rounded-2xl transition-all shadow-xl shadow-red-600/20 uppercase tracking-widest active:scale-95">
+                Authorize Access
+            </button>
+            <p class="text-center text-slate-400 mt-8 text-sm">
+                Unregistered Personnel? 
+                <a href="#" onclick="toggleForm()" class="text-red-400 font-bold hover:text-red-300 transition-colors">Register Here</a>
+            </p>
+        </div>
+
+        <!-- Register Form -->
+        <div id="registerForm" class="hidden space-y-5">
+            <input type="text" id="regName" placeholder="Full Name" class="w-full bg-slate-800/50 border border-slate-700 rounded-2xl p-4 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all placeholder:text-slate-500">
+            <input type="email" id="regEmail" placeholder="Work Email" class="w-full bg-slate-800/50 border border-slate-700 rounded-2xl p-4 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all placeholder:text-slate-500">
+            <input type="password" id="regPassword" placeholder="Set Password" class="w-full bg-slate-800/50 border border-slate-700 rounded-2xl p-4 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all placeholder:text-slate-500">
+            
+            <div class="p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+                <p class="text-xs text-blue-400 text-center uppercase tracking-wider font-semibold">Role: Staff (Default)</p>
+            </div>
+            
+            <button onclick="handleRegister()" id="regBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-2xl transition-all shadow-xl shadow-blue-600/20 uppercase tracking-widest active:scale-95">
+                Create Identity
+            </button>
+            <p class="text-center text-slate-400 mt-8 text-sm">
+                Already Authorized? 
+                <a href="#" onclick="toggleForm()" class="text-blue-400 font-bold hover:text-blue-300 transition-colors">Back to Login</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full bg-white text-slate-900 font-bold shadow-2xl opacity-0 transition-all pointer-events-none"></div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user) {
+                window.location.href = user.role === 'Admin' ? 'admin.html' : 'dashboard.html';
+            }
+        });
+
+        function toggleForm() {
+            const login = document.getElementById('loginForm');
+            const register = document.getElementById('registerForm');
+            login.classList.toggle('hidden');
+            register.classList.toggle('hidden');
+        }
+    </script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
+</body>
+</html>

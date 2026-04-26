@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#dc2626">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RapidCrisis">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="images/icon-192.png">
+    <title>Admin Command Center | Rapid Crisis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=3">
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Navigation -->
+    <nav class="glass border-b border-white/10 px-8 py-4 flex justify-between items-center z-50">
+        <div class="flex items-center space-x-4">
+            <div class="bg-red-600 p-2 rounded-xl">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <h1 class="text-xl font-black text-white uppercase tracking-tighter">Command Center</h1>
+        </div>
+        <div class="flex items-center space-x-6">
+            <div class="flex space-x-2">
+                <button onclick="fetchAlerts('Active')" id="btnActive" class="px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-bold transition-all">Active</button>
+                <button onclick="fetchAlerts('Resolved')" id="btnResolved" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-400 text-sm font-bold hover:bg-slate-700 transition-all">Resolved</button>
+            </div>
+            <a href="history.html" class="text-slate-400 hover:text-white font-bold text-sm">History</a>
+            <button onclick="logout()" class="text-slate-400 hover:text-white font-bold text-sm">Logout</button>
+        </div>
+    </nav>
+
+    <main class="flex-1 flex overflow-hidden">
+        <!-- Sidebar: Alert List -->
+        <aside class="w-96 glass border-r border-white/5 flex flex-col relative z-20">
+            <div class="p-8 border-b border-white/5 bg-white/[0.02]">
+                <div class="flex items-center space-x-3 mb-2">
+                    <div class="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center shadow-lg shadow-red-600/50">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    </div>
+                    <h1 id="listTitle" class="text-xl font-black text-white uppercase tracking-tighter">Command Center</h1>
+                </div>
+                <p class="text-slate-500 text-[10px] font-bold uppercase tracking-[0.3em]">Operational Unit Alpha</p>
+            </div>
+            
+            <!-- Filter Tabs -->
+            <div id="alertList" class="flex-1 overflow-y-auto p-4 space-y-4">
+                <!-- Alerts will be injected here -->
+                <div class="text-center py-20 text-slate-500">
+                    <div class="animate-spin h-8 w-8 border-4 border-red-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+                    Monitoring system...
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Area: Alert Details (Expanded) -->
+        <section class="flex-1 relative flex flex-col p-6 items-center justify-center">
+            <div id="noAlertSelected" class="text-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 text-slate-800 mx-auto mb-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                <h2 class="text-2xl font-black text-slate-700 uppercase tracking-widest">Select an alert to view details</h2>
+            </div>
+
+            <!-- Detail Overlay (Full Screen focused) -->
+            <div id="alertDetails" class="hidden w-full max-w-4xl glass p-12 rounded-[3rem] animate-slide-in border border-white/20 z-20 relative overflow-hidden">
+                <!-- Background Graphic Overlay -->
+                <div id="detailBgIcon" class="absolute -bottom-10 -right-10 opacity-5 pointer-events-none transform rotate-12">
+                    <!-- Icon injected via JS -->
+                </div>
+
+                <div class="space-y-8 relative z-10">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="flex items-center space-x-4 mb-4">
+                                <span id="detailType" class="px-5 py-2 rounded-xl bg-red-600 text-xs font-black uppercase text-white tracking-widest">FIRE</span>
+                                <span id="detailTime" class="text-slate-400 text-sm">Triggered 2m ago</span>
+                            </div>
+                            <h3 id="detailStaff" class="text-5xl font-black text-white leading-tight">Staff Member Name</h3>
+                        </div>
+                        <button id="resolveBtn" class="bg-green-600 hover:bg-green-500 text-white px-10 py-5 rounded-3xl font-bold uppercase tracking-widest transition-all shadow-xl shadow-green-600/20 active:scale-95">Mark Resolved</button>
+                    </div>
+
+                    <div class="pt-8 border-t border-white/10">
+                        <h4 class="text-slate-500 text-xs font-black uppercase tracking-widest mb-4">Incident Address</h4>
+                        <div id="detailCoords" class="text-2xl text-white font-medium bg-white/5 p-8 rounded-3xl border border-white/10 mb-8">
+                            Fetching address...
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-8">
+                            <div>
+                                <h4 class="text-slate-500 text-xs font-black uppercase tracking-widest mb-2">Country</h4>
+                                <div id="detailCountry" class="text-lg text-white font-medium bg-white/5 p-4 rounded-xl border border-white/10">N/A</div>
+                            </div>
+                            <div>
+                                <h4 class="text-slate-500 text-xs font-black uppercase tracking-widest mb-2">Contact Phone</h4>
+                                <div id="detailPhone" class="text-lg text-white font-medium bg-white/5 p-4 rounded-xl border border-white/10">N/A</div>
+                            </div>
+                        </div>
+
+                        <!-- Emergency Contacts -->
+                        <h4 class="text-slate-500 text-xs font-black uppercase tracking-widest mb-4">🚨 Emergency Services — Direct Contact</h4>
+                        <div class="space-y-3" id="dispatchControls">
+
+                            <!-- Hospital / Ambulance -->
+                            <div class="flex items-center justify-between bg-blue-600/10 border border-blue-600/30 p-4 rounded-2xl hover:bg-blue-600/20 transition-all">
+                                <div class="flex items-center gap-4">
+                                    <span class="text-3xl">🚑</span>
+                                    <div>
+                                        <p class="text-blue-400 font-black uppercase text-xs tracking-widest">Ambulance / Hospital</p>
+                                        <p class="text-white text-sm font-bold mt-0.5">Emergency Medical Services</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-2">
+                                    <a href="tel:108" onclick="dispatch('Hospital')" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all active:scale-95">📞 Call 108</a>
+                                    <a href="https://wa.me/108" target="_blank" onclick="dispatch('Hospital')" class="bg-green-600 hover:bg-green-500 text-white px-4 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all active:scale-95">🟢 WhatsApp</a>
+                                </div>
+                            </div>
+
+                            <!-- Fire Service -->
+                            <div class="flex items-center justify-between bg-red-600/10 border border-red-600/30 p-4 rounded-2xl hover:bg-red-600/20 transition-all">
+                                <div class="flex items-center gap-4">
+                                    <span class="text-3xl">🚒</span>
+                                    <div>
+                                        <p class="text-red-400 font-black uppercase text-xs tracking-widest">Fire & Rescue</p>
+                                        <p class="text-white text-sm font-bold mt-0.5">Fire Department Services</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-2">
+                                    <a href="tel:101" onclick="dispatch('Fire Rescue')" class="bg-red-600 hover:bg-red-500 text-white px-4 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all active:scale-95">📞 Call 101</a>
+                                    <a href="https://wa.me/101" target="_blank" onclick="dispatch('Fire Rescue')" class="bg-green-600 hover:bg-green-500 text-white px-4 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all active:scale-95">🟢 WhatsApp</a>
+                                </div>
+                            </div>
+
+                            <!-- Security / Police -->
+                            <div class="flex items-center justify-between bg-orange-600/10 border border-orange-600/30 p-4 rounded-2xl hover:bg-orange-600/20 transition-all">
+                                <div class="flex items-center gap-4">
+                                    <span class="text-3xl">🚓</span>
+                                    <div>
+                                        <p class="text-orange-400 font-black uppercase text-xs tracking-widest">Security / Police</p>
+                                        <p class="text-white text-sm font-bold mt-0.5">Law Enforcement & Security</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-2">
+                                    <a href="tel:100" onclick="dispatch('Security')" class="bg-orange-600 hover:bg-orange-500 text-white px-4 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all active:scale-95">📞 Call 100</a>
+                                    <a href="https://wa.me/100" target="_blank" onclick="dispatch('Security')" class="bg-green-600 hover:bg-green-500 text-white px-4 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all active:scale-95">🟢 WhatsApp</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="dispatchedList" class="mt-4 text-xs text-green-400 font-bold uppercase tracking-widest"></div>
+
+                        <!-- Admin Reply to Staff -->
+                        <div class="mt-8 pt-8 border-t border-white/10">
+                            <h4 class="text-slate-500 text-xs font-black uppercase tracking-widest mb-4">Reply to Staff</h4>
+                            
+                            <!-- Quick Reply Buttons -->
+                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                <button onclick="quickReply('✅ Alert reviewed. Help is on the way. Please remain calm and standby.')" 
+                                    class="bg-green-600/20 hover:bg-green-600 text-green-400 hover:text-white border border-green-600/30 p-3 rounded-xl font-bold uppercase text-[10px] transition-all text-left">
+                                    ✅ Acknowledged
+                                </button>
+                                <button onclick="quickReply('⏳ Your alert is under review. Please provide more details about the situation.')" 
+                                    class="bg-yellow-600/20 hover:bg-yellow-600 text-yellow-400 hover:text-white border border-yellow-600/30 p-3 rounded-xl font-bold uppercase text-[10px] transition-all text-left">
+                                    ⏳ Need More Info
+                                </button>
+                                <button onclick="quickReply('🚨 URGENT: Take immediate action. Evacuate the area and wait for emergency services.')" 
+                                    class="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white border border-red-600/30 p-3 rounded-xl font-bold uppercase text-[10px] transition-all text-left">
+                                    🚨 Urgent Action
+                                </button>
+                                <button onclick="quickReply('✔️ Situation resolved. Thank you for the alert. No further action needed.')" 
+                                    class="bg-slate-700/50 hover:bg-slate-600 text-slate-400 hover:text-white border border-slate-600/30 p-3 rounded-xl font-bold uppercase text-[10px] transition-all text-left">
+                                    ✔️ Stand Down
+                                </button>
+                            </div>
+
+                            <!-- Custom Reply Input -->
+                            <div class="flex gap-3">
+                                <textarea id="adminReplyInput" rows="2" 
+                                    placeholder="Type a custom reply to this staff member..."
+                                    class="flex-1 bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-white text-sm focus:outline-none focus:border-amber-500 transition-all resize-none"></textarea>
+                                <button onclick="sendAdminReply()" 
+                                    class="bg-amber-600 hover:bg-amber-500 text-white px-6 rounded-2xl font-bold uppercase text-xs transition-all active:scale-95 self-stretch">
+                                    Send
+                                </button>
+                            </div>
+
+                            <!-- Previous Reply Display -->
+                            <div id="previousReply" class="hidden mt-4 p-4 bg-amber-600/10 border border-amber-600/30 rounded-2xl">
+                                <p class="text-amber-400 text-[10px] font-black uppercase tracking-widest mb-1">Last Admin Reply</p>
+                                <p id="previousReplyText" class="text-white text-sm"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Sound Element -->
+    <audio id="alertSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-12 left-1/2 -translate-x-1/2 glass px-8 py-4 rounded-2xl text-white font-bold opacity-0 transition-opacity z-50 pointer-events-none"></div>
+
+    <script src="script.js"></script>
+    <script>
+        window.onload = async () => {
+            const userStr = localStorage.getItem('user');
+            const token = localStorage.getItem('token');
+
+            // Check if user data exists
+            if (!userStr || !token) {
+                console.warn('Not logged in. Redirecting to login...');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            let user;
+            try {
+                user = JSON.parse(userStr);
+            } catch(e) {
+                console.error('Corrupt user data. Clearing and redirecting...');
+                localStorage.clear();
+                window.location.href = 'index.html';
+                return;
+            }
+
+            if (user.role !== 'Admin') {
+                console.warn('Not an admin. Redirecting to staff dashboard...');
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
+            // Show admin name in nav
+            document.querySelector('nav h1').innerText = `CMD: ${user.name}`;
+
+            // Verify token is still valid by pinging the API
+            try {
+                const res = await fetch(`${API_BASE}/get-alerts?status=Active`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.status === 401) {
+                    console.warn('Token expired. Redirecting to login...');
+                    localStorage.clear();
+                    window.location.href = 'index.html';
+                    return;
+                }
+            } catch(e) {
+                // Server might be down, but still show the page
+                console.error('Could not verify token:', e);
+            }
+            
+            console.log(`Admin dashboard loaded for: ${user.name}`);
+            fetchAlerts('Active');
+            // Real-time polling every 2 seconds
+            setInterval(() => fetchAlerts(currentFilter, true), 2000);
+        };
+    </script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
+</body>
+</html>

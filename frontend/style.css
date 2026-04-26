@@ -1,0 +1,180 @@
+/* Rapid Crisis Response System - Premium CSS */
+
+:root {
+    --primary: #ff4d4d;
+    --primary-dark: #cc0000;
+    --secondary: #2d3436;
+    --accent: #00cec9;
+    --bg-dark: #0f172a;
+    --glass: rgba(30, 41, 59, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--bg-dark);
+    background-image: url('images/global-bg.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    background-attachment: fixed;
+    color: #f8fafc;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(to bottom, rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.95));
+}
+
+/* Backward compatibility for existing class names (now redundant as body handles it) */
+.dashboard-bg, .bg-hotel, .bg-emergency {
+    display: none;
+}
+
+/* Glassmorphism */
+.glass {
+    background: var(--glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-5px);
+}
+
+/* Animations */
+@keyframes pulse-red {
+    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+    70% { box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.animate-pulse-red {
+    animation: pulse-red 2s infinite;
+}
+
+@keyframes slideIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-slide-in {
+    animation: slideIn 0.5s ease-out forwards;
+}
+
+/* Buttons */
+.btn-emergency {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-emergency::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 300%;
+    height: 300%;
+    background: rgba(255,255,255,0.1);
+    transform: translate(-50%, -50%) rotate(45deg) scale(0);
+    transition: transform 0.5s;
+}
+
+.btn-emergency:active::after {
+    transform: translate(-50%, -50%) rotate(45deg) scale(1);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+}
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
+
+/* Map Styling */
+#map {
+    border-radius: 1.5rem;
+    overflow: hidden;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark Mode Overrides (if needed) */
+.dark-overlay {
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0) 0%, rgba(15, 23, 42, 0.8) 100%);
+}
+/* Pulse Marker for Maps */
+.pulse-marker-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pulse-marker {
+    width: 20px;
+    height: 20px;
+    background: rgba(239, 68, 68, 0.4);
+    border-radius: 50%;
+    position: absolute;
+    animation: marker-pulse 2s infinite;
+}
+
+.pulse-marker-core {
+    width: 10px;
+    height: 10px;
+    background: #ef4444;
+    border: 2px solid white;
+    border-radius: 50%;
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+}
+
+@keyframes marker-pulse {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(4); opacity: 0; }
+}
+
+/* Leaflet Zoom Control Styling */
+.leaflet-bar {
+    border: none !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
+}
+.leaflet-bar a {
+    background-color: var(--glass) !important;
+    color: white !important;
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border) !important;
+}
+.leaflet-bar a:hover {
+    background-color: rgba(255,255,255,0.1) !important;
+}

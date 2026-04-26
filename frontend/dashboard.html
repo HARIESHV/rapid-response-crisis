@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#dc2626">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RapidCrisis">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="images/icon-192.png">
+    <title>Dashboard | Staff Emergency Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=3">
+</head>
+<body class="min-h-screen p-6 md:p-12 text-slate-100">
+    <!-- Header -->
+    <header class="max-w-6xl mx-auto flex justify-between items-center mb-12 animate-slide-in">
+        <div>
+            <h1 class="text-3xl font-black text-white uppercase tracking-tighter">Staff Dashboard</h1>
+            <p id="staffName" class="text-slate-400">Welcome, Staff</p>
+        </div>
+        <button onclick="logout()" class="glass px-6 py-3 rounded-2xl text-slate-300 font-bold hover:text-white hover:bg-white/10 transition-all">
+            Logout
+        </button>
+    </header>
+
+    <main class="max-w-xl mx-auto">
+        <div id="mainDashboard" class="space-y-8 animate-slide-in" style="animation-delay: 0.1s;">
+            <div class="text-center mb-12">
+                <h2 class="text-5xl font-black text-white mb-4 uppercase">Emergency System</h2>
+                <p class="text-slate-400 text-lg">Complete the form to notify Admin</p>
+            </div>
+
+            <!-- Emergency Form -->
+            <div class="glass p-10 rounded-[3rem] border border-white/10 space-y-8 shadow-2xl">
+                <!-- Hotel Name -->
+                <div>
+                    <label class="block text-slate-500 text-xs font-black uppercase tracking-widest mb-4">Hotel / Building Name</label>
+                    <input type="text" id="hotelName" placeholder="Enter hotel name..." 
+                           class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white text-lg focus:outline-none focus:border-red-500 transition-all">
+                </div>
+
+                <!-- Address -->
+                <div>
+                    <label class="block text-slate-500 text-xs font-black uppercase tracking-widest mb-4">Specific Address / Room</label>
+                    <input type="text" id="manualAddress" placeholder="Enter room or address..." 
+                           class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white text-lg focus:outline-none focus:border-red-500 transition-all">
+                </div>
+
+                <!-- Country & Phone -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-slate-500 text-xs font-black uppercase tracking-widest mb-4">Country</label>
+                        <input type="text" id="country" placeholder="e.g. USA" 
+                               class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white text-lg focus:outline-none focus:border-red-500 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-slate-500 text-xs font-black uppercase tracking-widest mb-4">Phone Number</label>
+                        <input type="tel" id="phoneNumber" placeholder="+1..." 
+                               class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white text-lg focus:outline-none focus:border-red-500 transition-all">
+                    </div>
+                </div>
+
+                <!-- Problem Type -->
+                <div>
+                    <label class="block text-slate-500 text-xs font-black uppercase tracking-widest mb-4">Type of Emergency</label>
+                    <div class="grid grid-cols-3 gap-4">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="problemType" value="Fire" class="hidden peer" checked>
+                            <div class="p-4 text-center rounded-2xl border border-white/10 bg-white/5 text-slate-400 peer-checked:bg-red-600 peer-checked:text-white peer-checked:border-red-500 transition-all font-bold uppercase text-xs">Fire</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="problemType" value="Medical" class="hidden peer">
+                            <div class="p-4 text-center rounded-2xl border border-white/10 bg-white/5 text-slate-400 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-500 transition-all font-bold uppercase text-xs">Medical</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="problemType" value="Security" class="hidden peer">
+                            <div class="p-4 text-center rounded-2xl border border-white/10 bg-white/5 text-slate-400 peer-checked:bg-orange-600 peer-checked:text-white peer-checked:border-orange-500 transition-all font-bold uppercase text-xs">Security</div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button onclick="submitEmergency()" id="submitBtn" class="w-full bg-red-600 hover:bg-red-500 text-white py-6 rounded-[2rem] font-black uppercase tracking-[0.2em] shadow-xl shadow-red-600/30 transition-all active:scale-95 text-lg">
+                    Submit Emergency
+                </button>
+            </div>
+        </div>
+
+        <!-- Alert Status -->
+        <div id="alertStatus" class="hidden glass p-12 rounded-[3rem] text-center animate-slide-in">
+            <div class="w-32 h-32 bg-red-600/20 rounded-full flex items-center justify-center mx-auto mb-8 animate-pulse">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <h2 class="text-4xl font-black text-white mb-4 uppercase">Emergency Triggered</h2>
+            <p id="transmittedHotel" class="text-white font-bold text-xl mb-1"></p>
+            <p id="transmittedAddress" class="text-red-400 font-medium mb-8"></p>
+            <p class="text-slate-400 text-lg mb-8 uppercase tracking-widest text-xs">Admin response team notified</p>
+            
+            <!-- Admin Reply Box -->
+            <div id="adminReplyBox" class="hidden mt-2 mb-6 p-6 bg-amber-600/10 border border-amber-500/40 rounded-3xl text-left">
+                <p class="text-amber-400 text-[10px] font-black uppercase tracking-widest mb-2">Admin Response</p>
+                <p id="adminReplyContent" class="text-white font-medium text-sm leading-relaxed"></p>
+            </div>
+
+            <div class="space-y-4 pt-6 border-t border-white/10">
+                <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest">No response yet?</p>
+                <button onclick="sendFollowUp()" id="followUpBtn" class="w-full bg-amber-600/20 hover:bg-amber-600 text-amber-500 hover:text-white border border-amber-600/30 py-4 rounded-2xl font-bold uppercase text-xs transition-all">
+                    Send Urgent Follow-up
+                </button>
+                <a href="messages.html" class="block text-slate-400 hover:text-white text-xs font-bold transition-colors">Open Message Channel</a>
+            </div>
+
+            <!-- Direct Contact to Admin -->
+            <div class="mt-6 pt-6 border-t border-white/10">
+                <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-4">📞 Contact Admin Directly</p>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between bg-purple-600/10 border border-purple-600/30 p-4 rounded-2xl">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">👨‍💼</span>
+                            <div>
+                                <p class="text-purple-400 font-black uppercase text-xs tracking-widest">Admin Office</p>
+                                <p class="text-white text-sm font-bold">Command Center</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <a href="tel:+919999999999" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all active:scale-95">📞 Call Admin</a>
+                            <a href="https://wa.me/919999999999" target="_blank" class="bg-green-600 hover:bg-green-500 text-white px-4 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all active:scale-95">🟢 WhatsApp</a>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between bg-green-600/10 border border-green-600/30 p-4 rounded-2xl">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">💬</span>
+                            <div>
+                                <p class="text-green-400 font-black uppercase text-xs tracking-widest">Message Admin</p>
+                                <p class="text-white text-sm font-bold">Send a direct message</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <a href="messages.html" class="bg-green-600 hover:bg-green-500 text-white px-4 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all active:scale-95">💬 Send Message</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="toast" class="fixed bottom-12 left-1/2 -translate-x-1/2 glass px-8 py-4 rounded-2xl text-white font-bold opacity-0 transition-opacity z-50 pointer-events-none"></div>
+
+    <script src="script.js"></script>
+    <script>
+        let staffAlertId = null;        // Tracks the ID of the alert this staff member sent
+        let replyPollInterval = null;   // Interval handle for polling
+        let lastSeenReply = '';
+        let lastSeenStatus = '';
+
+        function setAlertStatusScreenVisible() {
+            const mainDashboard = document.getElementById('mainDashboard');
+            const alertStatus = document.getElementById('alertStatus');
+            if (mainDashboard && alertStatus) {
+                mainDashboard.classList.add('hidden');
+                alertStatus.classList.remove('hidden');
+            }
+        }
+
+        function renderAdminAlertUpdate(data) {
+            const box = document.getElementById('adminReplyBox');
+            const content = document.getElementById('adminReplyContent');
+            if (!box || !content) return;
+
+            const parts = [];
+            if (data.status) {
+                parts.push(`Status: ${data.status}`);
+            }
+            if (data.dispatched_services) {
+                parts.push(`Dispatched: ${data.dispatched_services}`);
+            }
+            if (data.admin_reply) {
+                parts.push(`Admin: ${data.admin_reply}`);
+            }
+
+            if (parts.length > 0) {
+                content.innerText = parts.join('\n');
+                if (box.classList.contains('hidden')) {
+                    box.classList.remove('hidden');
+                    box.style.animation = 'slideIn 0.4s ease-out forwards';
+                }
+            }
+        }
+
+        async function restoreLatestAlertState() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+
+                const res = await fetch(`${API_BASE}/my-latest-alert`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) return;
+
+                const data = await res.json();
+                if (!data.alert || !data.alert.id) return;
+
+                staffAlertId = data.alert.id;
+                localStorage.setItem('staffAlertId', String(staffAlertId));
+
+                setAlertStatusScreenVisible();
+
+                if (data.alert.hotel_name) {
+                    const hotelEl = document.getElementById('transmittedHotel');
+                    if (hotelEl) hotelEl.innerText = data.alert.hotel_name;
+                }
+                if (data.alert.address) {
+                    const addressEl = document.getElementById('transmittedAddress');
+                    if (addressEl) addressEl.innerText = data.alert.address;
+                }
+
+                lastSeenReply = data.alert.admin_reply || '';
+                lastSeenStatus = data.alert.status || '';
+                renderAdminAlertUpdate(data.alert);
+            } catch (e) {
+                // Silent fail; page still works without restore.
+            }
+        }
+
+        async function initStaffDashboard() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
+            if (user.role === 'Admin') {
+                window.location.href = 'admin.html';
+                return;
+            }
+            document.getElementById('staffName').innerText = `Welcome, ${user.name}`;
+            
+            const persistedId = localStorage.getItem('staffAlertId');
+            if (persistedId) {
+                staffAlertId = Number(persistedId);
+                setAlertStatusScreenVisible();
+            }
+
+            await restoreLatestAlertState();
+
+            if (staffAlertId) {
+                if (replyPollInterval) clearInterval(replyPollInterval);
+                replyPollInterval = setInterval(pollForAdminReply, 3000);
+                pollForAdminReply();
+            }
+        }
+
+        // Poll the backend every 3s for an admin reply on the staff's alert
+        async function pollForAdminReply() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+
+                // First, self-heal the alert ID from backend state in case local storage is stale.
+                const latestRes = await fetch(`${API_BASE}/my-latest-alert`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (latestRes.ok) {
+                    const latestData = await latestRes.json();
+                    if (latestData.alert && latestData.alert.id) {
+                        if (staffAlertId !== latestData.alert.id) {
+                            staffAlertId = latestData.alert.id;
+                            localStorage.setItem('staffAlertId', String(staffAlertId));
+                        }
+                        setAlertStatusScreenVisible();
+                        renderAdminAlertUpdate(latestData.alert);
+
+                        if (latestData.alert.hotel_name) {
+                            const hotelEl = document.getElementById('transmittedHotel');
+                            if (hotelEl) hotelEl.innerText = latestData.alert.hotel_name;
+                        }
+                        if (latestData.alert.address) {
+                            const addressEl = document.getElementById('transmittedAddress');
+                            if (addressEl) addressEl.innerText = latestData.alert.address;
+                        }
+                    }
+                }
+
+                if (!staffAlertId) return;
+
+                const res = await fetch(`${API_BASE}/get-alert-reply?alert_id=${staffAlertId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) return;
+                const data = await res.json();
+                renderAdminAlertUpdate(data);
+
+                if (data.admin_reply && data.admin_reply.trim() !== '' && data.admin_reply !== lastSeenReply) {
+                    showToast('📨 Admin has responded to your alert!');
+                    lastSeenReply = data.admin_reply;
+                }
+                if (data.status && data.status !== lastSeenStatus) {
+                    showToast(`Alert status updated: ${data.status}`);
+                    lastSeenStatus = data.status;
+                }
+            } catch(e) {
+                // Silent fail — keep polling
+            }
+        }
+
+        // Start polling when the alert status screen is shown
+        // Override the triggerAlert success path to capture alert ID
+        document.addEventListener('alertSent', (e) => {
+            staffAlertId = e.detail.alertId;
+            localStorage.setItem('staffAlertId', String(staffAlertId));
+            if (replyPollInterval) clearInterval(replyPollInterval);
+            replyPollInterval = setInterval(pollForAdminReply, 3000);
+            pollForAdminReply();
+        });
+
+        document.addEventListener('DOMContentLoaded', initStaffDashboard);
+    </script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
+</body>
+</html>

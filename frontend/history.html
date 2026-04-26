@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#dc2626">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RapidCrisis">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="images/icon-192.png">
+    <title>Alert History | Rapid Crisis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="min-h-screen p-6 md:p-12">
+    <div class="bg-emergency"></div>
+
+    <header class="max-w-6xl mx-auto flex justify-between items-center mb-12 animate-slide-in">
+        <div>
+            <h1 class="text-3xl font-black text-white uppercase tracking-tighter">Alert History</h1>
+            <p class="text-slate-400">View all resolved and past emergencies</p>
+        </div>
+        <div class="flex space-x-4">
+            <a href="admin.html" class="glass px-6 py-3 rounded-2xl text-slate-300 font-bold hover:text-white hover:bg-white/10 transition-all">
+                Back to Dashboard
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto">
+        <div class="glass rounded-[2.5rem] overflow-hidden border border-white/10 animate-slide-in" style="animation-delay: 0.1s;">
+            <table class="w-full text-left">
+                <thead class="bg-white/5 border-b border-white/10">
+                    <tr>
+                        <th class="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-widest">Type</th>
+                        <th class="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-widest">Staff</th>
+                        <th class="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-widest">Hotel</th>
+                        <th class="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-widest">Address</th>
+                        <th class="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-widest">Triggered</th>
+                        <th class="px-8 py-5 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTable" class="divide-y divide-white/5">
+                    <!-- Data will be injected here -->
+                    <tr>
+                        <td colspan="6" class="px-8 py-20 text-center text-slate-500">
+                            Loading history...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        async function loadHistory() {
+            try {
+                const res = await fetch(`${API_BASE}/get-alerts?status=Resolved`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                const alerts = await res.json();
+                const container = document.getElementById('historyTable');
+                
+                if (alerts.length === 0) {
+                    container.innerHTML = '<tr><td colspan="6" class="px-8 py-10 text-center text-slate-500">No history found</td></tr>';
+                    return;
+                }
+
+                container.innerHTML = alerts.map(alert => `
+                    <tr class="hover:bg-white/5 transition-colors">
+                        <td class="px-8 py-6">
+                            <span class="px-3 py-1 rounded-full bg-slate-800 text-slate-300 text-[10px] font-black uppercase">${alert.type}</span>
+                        </td>
+                        <td class="px-8 py-6 font-bold text-white">${alert.staff_name}</td>
+                        <td class="px-8 py-6 text-red-400 font-bold text-xs uppercase">${alert.hotel_name || 'N/A'}</td>
+                        <td class="px-8 py-6 text-slate-400 text-sm max-w-xs truncate">${alert.address || 'No address'}</td>
+                        <td class="px-8 py-6 text-slate-400 text-sm">${new Date(alert.timestamp).toLocaleString()}</td>
+                        <td class="px-8 py-6">
+                            <span class="text-green-500 font-bold text-sm uppercase">Resolved</span>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user || user.role !== 'Admin') {
+                window.location.href = 'index.html';
+                return;
+            }
+            loadHistory();
+        });
+    </script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
+</body>
+</html>
