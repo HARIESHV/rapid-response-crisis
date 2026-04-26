@@ -1,1 +1,1 @@
-web: gunicorn backend.app:app
+web: python run_prod.py
